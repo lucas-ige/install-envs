@@ -38,6 +38,9 @@ if [[ -z ${dir_dest} ]]; then
     echo "Error: please specify destination directory"
     exit 1
 fi
+mkdir -p ${dir_dest}
+dir_dest="$(cd "${dir_dest}" && pwd -P)"
+echo "Will install in ${dir_dest}"
 
 dir_work=./work_zlib
 if [[ -d ${dir_work} || -f ${dir_work} ]]; then
@@ -51,3 +54,14 @@ git clone ${url_repo} ${dir_work}
 echo "Checking out commit/branch/tag ${commit} from repository"
 cd ${dir_work}
 git checkout ${commit}
+
+echo "Configuring, compiling, and installing"
+./configure --prefix=${dir_dest}
+make check
+make install
+
+echo "Cleaning up"
+cd ..
+rm -rf ${dir_work}
+
+echo "zlib installed successfully"
