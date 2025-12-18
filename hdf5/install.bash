@@ -16,6 +16,11 @@ source parameters.conf
 
 while [[ $# -gt 0 ]]; do
     case $1 in
+        -c|--commit)
+            commit=$2
+            shift
+            shift
+            ;;
         -d|--destination)
             dir_dest=$2
             shift
@@ -27,13 +32,14 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
+commit=${commit:-develop}
 
 if [[ -z ${dir_dest} ]]; then
     echo "Error: please specify destination directory"
     exit 1
 fi
 
-dir_work=./work_netcdf-c
+dir_work=./work_hdf5
 if [[ -d ${dir_work} || -f ${dir_work} ]]; then
     echo "Error: work directory already exists (as file or directory)"
     exit 1
@@ -41,3 +47,7 @@ fi
 
 echo "Cloning from repository: ${url_repo}"
 git clone ${url_repo} ${dir_work}
+
+echo "Checking out commit/branch/tag ${commit} from repository"
+cd ${dir_work}
+git checkout ${commit}
