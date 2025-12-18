@@ -26,6 +26,11 @@ while [[ $# -gt 0 ]]; do
             shift
             shift
             ;;
+        -z|--zlib)
+            dir_zlib=$2
+            shift
+            shift
+            ;;
         *)
             echo "Error: unknown command-line argument: $1"
             exit 1
@@ -38,6 +43,15 @@ if [[ -z ${dir_dest} ]]; then
     echo "Error: please specify destination directory"
     exit 1
 fi
+mkdir -p ${dir_dest}
+dir_dest="$(cd "${dir_dest}" && pwd -P)"
+echo "Will install in ${dir_dest}"
+
+if [[ -z ${dir_zlib} ]]; then
+    echo "Error: please specify zlib directory"
+    exit 1
+fi
+dir_zlib="$(cd "${dir_zlib}" && pwd -P)"
 
 dir_work=./work_hdf5
 if [[ -d ${dir_work} || -f ${dir_work} ]]; then
@@ -51,3 +65,14 @@ git clone ${url_repo} ${dir_work}
 echo "Checking out commit/branch/tag ${commit} from repository"
 cd ${dir_work}
 git checkout ${commit}
+
+echo "Configuring, compiling, and installing"
+./configure --prefix=${dir_dest} --with-zlib=${dir_zlib} ${configure_options}
+make check
+make install
+
+echo "Cleaning up"
+cd ..
+rm -rf ${dir_work}
+
+echo "HDF5 installed successfully"
