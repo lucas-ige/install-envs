@@ -33,6 +33,10 @@ tags_netcdf_c=(
     v4.9.3
 )
 
+tags_netcdf_fortran=(
+    v4.6.2
+)
+
 #-------------------------#
 # Install the environment #
 #-------------------------#
@@ -74,6 +78,23 @@ for tag_zlib in ${tags_zlib[*]}; do
                     --zlib $dir_zlib \
                     --hdf5 $dir_hdf5
             fi
+
+            for tag_netcdf_fortran in ${tags_netcdf_fortran[*]}; do
+                version_netcdf_fortran=${tag_netcdf_fortran#v}
+                dir_netcdf_fortran=$dir_env/netcdf-fortran/
+                dir_netcdf_fortran+=v${version_netcdf_fortran}
+                dir_netcdf_fortran+=_netcdf-c-v${version_netcdf_c}
+                dir_netcdf_fortran+=_hdf5-v${version_hdf5}
+                dir_netcdf_fortran+=_zlib-v${version_zlib}
+                if [[ ! -d $dir_netcdf_fortran ]]; then
+                    cd $dir_repo/netcdf-fortran
+                    ./install.bash \
+                        --destination $dir_netcdf_fortran \
+                        --commit $tag_netcdf_fortran \
+                        --netcdf-c $dir_netcdf_c
+                fi
+            done
+
         done
 
     done
