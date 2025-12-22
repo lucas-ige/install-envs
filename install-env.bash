@@ -105,11 +105,24 @@ function create_module_file {
     echo "setenv ${name}_ROOT $dir_installed" >> $dest
 }
 
+#---------#
+# Prepare #
+#---------#
+
+dir_repo=$(pwd)
+version_gcc=$(gcc --version | head -n 1 | awk '{print $NF}')
+version_gfortran=$(gfortran --version | head -n 1 | awk '{print $NF}')
+if [[ "$version_gcc" != "$version_gfortran" ]]; then
+    echo "Error: GCC and GFORTRAN versions mismatch."
+    exit 1
+fi
+dir_env+=/gcc-v$version_gcc
+mkdir -p $dir_env
+dir_env="$(cd "${dir_env}" && pwd -P)"
+
 #-------------------------#
 # Install the environment #
 #-------------------------#
-
-dir_repo=$(pwd)
 
 for tag_zlib in ${tags_zlib[*]}; do
 
