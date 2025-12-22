@@ -26,8 +26,11 @@ tags_zlib=(
 )
 
 tags_hdf5=(
-    hdf5_1_10_11
     hdf5_1.14.6
+)
+
+tags_netcdf_c=(
+    v4.9.3
 )
 
 #-------------------------#
@@ -58,6 +61,21 @@ for tag_zlib in ${tags_zlib[*]}; do
                 --commit $tag_hdf5 \
                 --zlib $dir_zlib
         fi
+
+        for tag_netcdf_c in ${tags_netcdf_c[*]}; do
+            version_netcdf_c=${tag_netcdf_c#v}
+            dir_netcdf_c=$dir_env/netcdf-c/v${version_netcdf_c}
+            dir_netcdf_c+=_hdf5-v${version_hdf5}_zlib-v${version_zlib}
+            if [[ ! -d $dir_netcdf_c ]]; then
+                cd $dir_repo/netcdf-c
+                ./install.bash \
+                    --destination $dir_netcdf_c \
+                    --commit $tag_netcdf_c \
+                    --zlib $dir_zlib \
+                    --hdf5 $dir_hdf5
+            fi
+        done
+
     done
 
 done
