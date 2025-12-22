@@ -37,7 +37,7 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
-commit=${commit:-develop}
+commit=${commit:-${default_branch}}
 
 if [[ -z ${dir_dest} ]]; then
     echo "Error: please specify destination directory"
