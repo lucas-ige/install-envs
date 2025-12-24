@@ -121,7 +121,7 @@ function create_module_file {
         echo "prepend-path LD_LIBRARY_PATH $dir_installed/lib" >> $dest
     fi
     if [[ -d $dir_installed/bin ]]; then
-        echo "prepend-path PATH $dir_installed/lib" >> $dest
+        echo "prepend-path PATH $dir_installed/bin" >> $dest
     fi
     if [[ -d $dir_installed/lib/pkgconfig ]]; then
         echo "prepend-path PKG_CONFIG_PATH $dir_installed/lib/pkgconfig" >> $dest
