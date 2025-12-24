@@ -67,6 +67,7 @@ cd ${dir_work}
 git checkout ${commit}
 
 echo "Configuring, compiling, and installing"
+LD_LIBRARY_PATH="${dir_netcdf_c}/lib:$LD_LIBRARY_PATH" \
 CPPFLAGS="-I${dir_netcdf_c}/include" \
 LDFLAGS="-L${dir_netcdf_c}/lib" \
 ./configure --prefix=${dir_dest}

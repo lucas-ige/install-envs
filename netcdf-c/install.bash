@@ -78,6 +78,7 @@ cd ${dir_work}
 git checkout ${commit}
 
 echo "Configuring, compiling, and installing"
+LD_LIBRARY_PATH="${dir_zlib}/lib:${dir_hdf5}/lib:$LD_LIBRARY_PATH" \
 CPPFLAGS="-I${dir_hdf5}/include -I${dir_zlib}/include" \
 LDFLAGS="-L${dir_hdf5}/lib -L${dir_zlib}/lib" \
 ./configure --prefix=${dir_dest} ${configure_options}
