@@ -41,6 +41,35 @@ tags_netcdf_fortran=(
 # Function(s) #
 #-------------#
 
+function fix_permissions {
+    # Fix permissions in given directory.
+    #
+    # This function sets all the files and directories to read-only, and, for
+    # each file, gives the same executable permissions to the group as it finds
+    # for the owner. It also removes any permission that might be given to all
+    # users. In short, it gives the following permissions:
+    #
+    # -> r-xr-x--- to directories.
+    # -> r-xr-x--- to files that are already executable by the owner.
+    # -> r--r----- to all the other files.
+    #
+    # Parameters
+    # ----------
+    # $1: directory
+    #     Directory where permissions will be adjusted.
+    #
+    if [[ $# -ne 1 || ! -d $1 ]]; then
+        echo "Error: give the path to an existing directory as only argument."
+        exit 1
+    fi
+    dir_now=$(pwd)
+    cd $1
+    find -type f -perm -u=x -exec chmod 550 {} \;
+    find -type f ! -perm 550 -exec chmod 440 {} \;
+    find -type d -exec chmod 550 {} \;
+    cd $dir_now
+}
+
 function create_module_file {
     # Create module file for a library.
     #
@@ -103,6 +132,7 @@ function create_module_file {
     name=${name//-/_}
     name=${name^^}
     echo "setenv ${name}_ROOT $dir_installed" >> $dest
+    chmod 440 $dest
 }
 
 #---------#
@@ -134,6 +164,7 @@ for tag_zlib in ${tags_zlib[*]}; do
         ./install.bash \
             --destination $dir_zlib \
             --commit $tag_zlib
+        fix_permissions $dir_zlib
     fi
 
     # Create zlib module file
@@ -154,6 +185,7 @@ for tag_zlib in ${tags_zlib[*]}; do
                 --destination $dir_hdf5 \
                 --commit $tag_hdf5 \
                 --zlib $dir_zlib
+            fix_permissions $dir_hdf5
         fi
 
         # Create HDF5 module file
@@ -176,6 +208,7 @@ for tag_zlib in ${tags_zlib[*]}; do
                     --commit $tag_netcdf_c \
                     --zlib $dir_zlib \
                     --hdf5 $dir_hdf5
+                fix_permissions $dir_netcdf_c
             fi
 
             # Create netcdf-c module file
@@ -183,7 +216,6 @@ for tag_zlib in ${tags_zlib[*]}; do
             create_module_file \
                 --installed $dir_netcdf_c \
                 --whatis "The NetCDF C library" \
-                --prereq $dir_zlib.module \
                 --prereq $dir_hdf5.module
 
             for tag_netcdf_fortran in ${tags_netcdf_fortran[*]}; do
@@ -201,6 +233,7 @@ for tag_zlib in ${tags_zlib[*]}; do
                         --destination $dir_netcdf_fortran \
                         --commit $tag_netcdf_fortran \
                         --netcdf-c $dir_netcdf_c
+                    fix_permissions $dir_netcdf_fortran
                 fi
 
                 # Create netcdf-fortran module file
@@ -208,8 +241,6 @@ for tag_zlib in ${tags_zlib[*]}; do
                 create_module_file \
                     --installed $dir_netcdf_fortran \
                     --whatis "The NetCDF FORTRAN library" \
-                    --prereq $dir_zlib.module \
-                    --prereq $dir_hdf5.module \
                     --prereq $dir_netcdf_c.module
 
             done
@@ -219,3 +250,6 @@ for tag_zlib in ${tags_zlib[*]}; do
     done
 
 done
+
+chmod 550 $dir_env
+chmod 550 $dir_env/..
