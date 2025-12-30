@@ -156,44 +156,50 @@ dir_env="$(cd "${dir_env}" && pwd -P)"
 
 for tag_zlib in ${tags_zlib[*]}; do
 
-    # Install zlib library
     version_zlib=${tag_zlib#v}
     dir_zlib=$dir_env/zlib-v$version_zlib
+
     if [[ ! -d $dir_zlib ]]; then
+
+        # Install zlib
         cd $dir_repo/zlib
         ./install.bash \
             --destination $dir_zlib \
             --commit $tag_zlib
         fix_permissions $dir_zlib
-    fi
 
-    # Create zlib module file
-    cd $dir_repo
-    create_module_file \
-        --installed $dir_zlib \
-        --whatis "The zlib library"
+        # Create module file for zlib
+        cd $dir_repo
+        create_module_file \
+            --installed $dir_zlib \
+            --whatis "The zlib library"
+
+    fi
 
     for tag_hdf5 in ${tags_hdf5[*]}; do
 
-        # Install HDF5 library
         version_hdf5=${tag_hdf5#hdf5_}
         version_hdf5=${version_hdf5//_/.}
         dir_hdf5=$dir_env/hdf5-v${version_hdf5}_zlib-v$version_zlib
+
         if [[ ! -d $dir_hdf5 ]]; then
+
+            # Install HDF5
             cd $dir_repo/hdf5
             ./install.bash \
                 --destination $dir_hdf5 \
                 --commit $tag_hdf5 \
                 --zlib $dir_zlib
             fix_permissions $dir_hdf5
-        fi
 
-        # Create HDF5 module file
-        cd $dir_repo
-        create_module_file \
-            --installed $dir_hdf5 \
-            --whatis "The HDF5 library" \
-            --prereq $dir_zlib.module
+            # Create module file for HDF5
+            cd $dir_repo
+            create_module_file \
+                --installed $dir_hdf5 \
+                --whatis "The HDF5 library" \
+                --prereq $dir_zlib.module
+
+        fi
 
         # For convenience (and because some programs make this assumption
         # eg. the official WRF installation scripts), we install the NetCDF C
@@ -211,7 +217,7 @@ for tag_zlib in ${tags_zlib[*]}; do
 
                 if [[ ! -d $dir_netcdf ]]; then
 
-                    # Install netcdf-c library
+                    # Install netcdf-c
                     cd $dir_repo/netcdf-c
                     ./install.bash \
                         --destination $dir_netcdf \
@@ -219,14 +225,14 @@ for tag_zlib in ${tags_zlib[*]}; do
                         --zlib $dir_zlib \
                         --hdf5 $dir_hdf5
 
-                    # Install netcdf-fortran library
+                    # Install netcdf-fortran
                     cd $dir_repo/netcdf-fortran
                     ./install.bash \
                         --destination $dir_netcdf \
                         --commit $tag_netcdf_fortran \
                         --netcdf-c $dir_netcdf
 
-                    # Create NetCDF module file
+                    # Create module file for netcdf-*
                     cd $dir_repo
                     create_module_file \
                         --installed $dir_netcdf \
