@@ -195,56 +195,49 @@ for tag_zlib in ${tags_zlib[*]}; do
             --whatis "The HDF5 library" \
             --prereq $dir_zlib.module
 
+        # For convenience (and because some programs make this assumption
+        # eg. the official WRF installation scripts), we install the NetCDF C
+        # and FORTRAN libraries in the same directory
         for tag_netcdf_c in ${tags_netcdf_c[*]}; do
-
-            # Install netcdf-c library
-            version_netcdf_c=${tag_netcdf_c#v}
-            dir_netcdf_c=$dir_env/netcdf-c-v${version_netcdf_c}
-            dir_netcdf_c+=_hdf5-v${version_hdf5}_zlib-v${version_zlib}
-            if [[ ! -d $dir_netcdf_c ]]; then
-                cd $dir_repo/netcdf-c
-                ./install.bash \
-                    --destination $dir_netcdf_c \
-                    --commit $tag_netcdf_c \
-                    --zlib $dir_zlib \
-                    --hdf5 $dir_hdf5
-                fix_permissions $dir_netcdf_c
-            fi
-
-            # Create netcdf-c module file
-            cd $dir_repo
-            create_module_file \
-                --installed $dir_netcdf_c \
-                --whatis "The NetCDF C library" \
-                --prereq $dir_hdf5.module
-
             for tag_netcdf_fortran in ${tags_netcdf_fortran[*]}; do
 
-                # Install netcdf-fortran library
+                version_netcdf_c=${tag_netcdf_c#v}
                 version_netcdf_fortran=${tag_netcdf_fortran#v}
-                dir_netcdf_fortran=$dir_env/netcdf-fortran-
-                dir_netcdf_fortran+=v${version_netcdf_fortran}
-                dir_netcdf_fortran+=_netcdf-c-v${version_netcdf_c}
-                dir_netcdf_fortran+=_hdf5-v${version_hdf5}
-                dir_netcdf_fortran+=_zlib-v${version_zlib}
-                if [[ ! -d $dir_netcdf_fortran ]]; then
+                dir_netcdf=$dir_env/netcdf-fortran-
+                dir_netcdf+=v${version_netcdf_fortran}
+                dir_netcdf+=_netcdf-c-v${version_netcdf_c}
+                dir_netcdf+=_hdf5-v${version_hdf5}
+                dir_netcdf+=_zlib-v${version_zlib}
+
+                if [[ ! -d $dir_netcdf ]]; then
+
+                    # Install netcdf-c library
+                    cd $dir_repo/netcdf-c
+                    ./install.bash \
+                        --destination $dir_netcdf \
+                        --commit $tag_netcdf_c \
+                        --zlib $dir_zlib \
+                        --hdf5 $dir_hdf5
+
+                    # Install netcdf-fortran library
                     cd $dir_repo/netcdf-fortran
                     ./install.bash \
-                        --destination $dir_netcdf_fortran \
+                        --destination $dir_netcdf \
                         --commit $tag_netcdf_fortran \
-                        --netcdf-c $dir_netcdf_c
-                    fix_permissions $dir_netcdf_fortran
+                        --netcdf-c $dir_netcdf
+
+                    # Create NetCDF module file
+                    cd $dir_repo
+                    create_module_file \
+                        --installed $dir_netcdf \
+                        --whatis "The NetCDF C and FORTRAN libraries" \
+                        --prereq $dir_hdf5.module
+
+                    fix_permissions $dir_netcdf
+
                 fi
 
-                # Create netcdf-fortran module file
-                cd $dir_repo
-                create_module_file \
-                    --installed $dir_netcdf_fortran \
-                    --whatis "The NetCDF FORTRAN library" \
-                    --prereq $dir_netcdf_c.module
-
             done
-
         done
 
     done
