@@ -11,6 +11,7 @@ This repository contains scripts to install computing libraries on different sup
 
  1. Open the script `install.bash` located at the root of this repository.
  2. Modify:
+    - The list of modules you want to load for the compilation.
     - The directory where the environment will be installed (variable `dir_env`).
     - The versions of the libraries you want to install (these must be valid git tags). You can can specifiy more than
       one version for each library, in which case the script will install all the versions.
