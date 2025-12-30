@@ -60,7 +60,7 @@ if [[ -d ${dir_work} || -f ${dir_work} ]]; then
 fi
 
 echo "Cloning from repository: ${url_repo}"
-git clone ${url_repo} ${dir_work}
+git clone --quiet ${url_repo} ${dir_work}
 
 echo "Checking out commit/branch/tag ${commit} from repository"
 cd ${dir_work}
