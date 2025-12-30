@@ -21,6 +21,11 @@ set -e
 
 dir_env=/scratchu/$(whoami)/install-env
 
+modules=(
+    gcc/11.2.0
+    openmpi/4.0.7
+)
+
 tags_zlib=(
     v1.3.1
 )
@@ -139,6 +144,10 @@ function create_module_file {
 # Prepare #
 #---------#
 
+for m in ${modules[@]}; do
+    module load $m
+done
+
 dir_repo=$(pwd)
 version_gcc=$(gcc --version | head -n 1 | awk '{print $NF}')
 version_gfortran=$(gfortran --version | head -n 1 | awk '{print $NF}')
@@ -172,7 +181,8 @@ for tag_zlib in ${tags_zlib[*]}; do
         cd $dir_repo
         create_module_file \
             --installed $dir_zlib \
-            --whatis "The zlib library"
+            --whatis "The zlib library" \
+            ${modules[@]/#/--prereq }
 
     fi
 
@@ -197,6 +207,7 @@ for tag_zlib in ${tags_zlib[*]}; do
             create_module_file \
                 --installed $dir_hdf5 \
                 --whatis "The HDF5 library" \
+                ${modules[@]/#/--prereq } \
                 --prereq $dir_zlib.module
 
         fi
@@ -237,6 +248,7 @@ for tag_zlib in ${tags_zlib[*]}; do
                     create_module_file \
                         --installed $dir_netcdf \
                         --whatis "The NetCDF C and FORTRAN libraries" \
+                        ${modules[@]/#/--prereq } \
                         --prereq $dir_hdf5.module
 
                     fix_permissions $dir_netcdf
