@@ -69,8 +69,9 @@ git checkout ${commit}
 echo "Configuring, compiling, and installing"
 export LD_LIBRARY_PATH="${dir_netcdf_c}/lib:$LD_LIBRARY_PATH"
 export HDF5_PLUGIN_PATH=$(${dir_netcdf_c}/bin/nc-config --plugindir)
-CPPFLAGS="-I${dir_netcdf_c}/include" \
-LDFLAGS="-L${dir_netcdf_c}/lib" \
+CC=mpicc FC=mpif90 F77=mpif77 \
+CPPFLAGS="-I${dir_mpi}/include -I${dir_netcdf_c}/include" \
+LDFLAGS="-L${dir_mpi}/lib -L${dir_netcdf_c}/lib" \
 ./configure --prefix=${dir_dest}
 make check
 make install

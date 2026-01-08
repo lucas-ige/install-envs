@@ -10,7 +10,7 @@
 #
 
 #SBATCH --nodes=1
-#SBATCH --ntasks-per-node=1
+#SBATCH --ntasks-per-node=6
 #SBATCH --time=03:00:00
 
 set -e

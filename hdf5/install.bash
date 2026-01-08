@@ -67,6 +67,9 @@ cd ${dir_work}
 git checkout ${commit}
 
 echo "Configuring, compiling, and installing"
+CC=mpicc FC=mpif90 F77=mpif77 \
+CPPFLAGS="-I${dir_mpi}/include" \
+LDFLAGS="-L${dir_mpi}/lib" \
 ./configure --prefix=${dir_dest} --with-zlib=${dir_zlib} ${configure_options}
 make check
 make install
