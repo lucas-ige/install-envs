@@ -1,0 +1,2 @@
+ - Install the PNetCDF library and enable parallel I/O for non-HDF5 NetCDF files.
+ - Make parallel support an option, not an obligation
