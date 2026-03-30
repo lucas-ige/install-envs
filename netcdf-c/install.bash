@@ -79,13 +79,9 @@ git checkout ${commit}
 
 echo "Configuring, compiling, and installing"
 export LD_LIBRARY_PATH="${dir_zlib}/lib:${dir_hdf5}/lib:$LD_LIBRARY_PATH"
-CC=mpicc FC=mpif90 F77=mpif77 \
-CPPFLAGS="-I${dir_mpi}/include -I${dir_hdf5}/include -I${dir_zlib}/include" \
-LDFLAGS="-L${dir_mpi}/lib -L${dir_hdf5}/lib -L${dir_zlib}/lib" \
-./configure \
-    --prefix=${dir_dest} \
-    ${configure_options} \
-    --enable-parallel-tests
+CPPFLAGS="-I${dir_hdf5}/include -I${dir_zlib}/include" \
+LDFLAGS="-L${dir_hdf5}/lib -L${dir_zlib}/lib" \
+./configure --prefix=${dir_dest} ${configure_options}
 make check
 make install
 
