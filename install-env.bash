@@ -42,6 +42,10 @@ tags_netcdf_fortran=(
     v4.6.2
 )
 
+tags_flex=(
+    v2.6.4
+)
+
 #-------------#
 # Function(s) #
 #-------------#
@@ -159,9 +163,9 @@ dir_env+=/gcc-v$version_gcc
 mkdir -p $dir_env
 dir_env="$(cd "${dir_env}" && pwd -P)"
 
-#-------------------------#
-# Install the environment #
-#-------------------------#
+#-------------------------------------#
+# Install NetCDF and its dependencies #
+#-------------------------------------#
 
 for tag_zlib in ${tags_zlib[*]}; do
 
@@ -262,5 +266,39 @@ for tag_zlib in ${tags_zlib[*]}; do
 
 done
 
+#--------------#
+# Install flex #
+#--------------#
+
+for tag_flex in ${tags_flex[*]}; do
+
+    version_flex=${tag_flex#v}
+    dir_flex=$dir_env/flex-v$version_flex
+
+    if [[ ! -d $dir_flex ]]; then
+
+        # Install flex
+        cd $dir_repo/flex
+        ./install.bash \
+            --destination $dir_flex \
+            --commit $tag_flex
+        fix_permissions $dir_flex
+
+        # Create module file for flex
+        cd $dir_repo
+        create_module_file \
+            --installed $dir_flex \
+            --whatis "The flex library and executable" \
+            ${modules[@]/#/--prereq }
+
+    fi
+
+done
+
+#----------#
+# Finalise #
+#----------#
+
 chmod 550 $dir_env
 chmod 550 $dir_env/..
+echo "Environment installed successfully!"
